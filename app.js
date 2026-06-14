@@ -1,3 +1,4 @@
+const Joi = require('joi');
 const express = require('express');
 const app = express();
 
@@ -30,6 +31,27 @@ app.get('/api/products/:id',(req, res) => {
     if(!product) return res.status(404).send('Product not found');
     res.send(product);
 });
+
+app.post('/api/products', (req, res) => {
+    // object destructuring
+   const { error } = validateProduct(req.body);
+   if(error) return res.status(400).send(result.error.details[0].message);
+        
+    const product = {
+        id: products.length + 1;
+        name: req.body.name;
+    };
+   products.push(product);
+   res.send(product);
+});
+
+function validateProduct(product){
+    const schema = {
+        name: Joi.string().required();
+    };
+    return Joi.validate(product, schema);
+}
+
 
 const port = process.env.PORT || 3000;
 app.listen(port, () => console.log(`Listening on port ${port}...`));
